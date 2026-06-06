@@ -1,0 +1,47 @@
+# spec/deepseek-cli/v1.0.0.yml
+name: deepseek-cli
+version: 1.0.0
+description: Deterministic CLI wrapper for DeepSeek API
+
+inputs:
+  REQUIRED:
+    - prompt: string (from stdin, positional arg, or --prompt flag)
+  OPTIONAL:
+    - --system: string (system message file or inline)
+    - --model: string (default: deepseek-chat)
+    - --temperature: float (default: 0.0 for determinism)
+    - --max-tokens: int (default: 4096)
+    - --json: flag (request structured output)
+    - --schema: path (JSON Schema file for structured output)
+    - --tools: path (tool definitions file)
+    - --api-key: string (falls back to DEEPSEEK_API_KEY env var)
+    - --stream: flag (stream output)
+    - --file: path (read prompt from file)
+    - --version: flag
+
+outputs:
+  SUCCESS:
+    - stdout: model response text
+    - exit code: 0
+  ERRORS:
+    - Missing API key: exit code 1, stderr message
+    - API error: exit code 2, stderr with status code
+    - Schema validation failure: exit code 3, stderr details
+
+behavior:
+  determinism:
+    - temperature defaults to 0.0
+    - seed parameter sent when available
+    - structured output uses strict JSON mode when --json is set
+  piping:
+    - Accepts stdin: echo "prompt" | deepseek-cli
+    - Positional: deepseek-cli "prompt"
+    - Flag: deepseek-cli --prompt "prompt"
+  logging:
+    - --verbose flag outputs full request/response to stderr
+
+examples:
+  - deepseek-cli "Explain quantum computing"
+  - cat question.txt | deepseek-cli --system system.txt
+  - deepseek-cli --prompt "..." --json --schema response.schema.json
+
