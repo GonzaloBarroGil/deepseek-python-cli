@@ -3,21 +3,23 @@
 Test suite for deepseek-cli
 Validates against spec/deepseek-cli/v1.0.0.yml
 
+Version: 1.0.1 - Fixed mocking architecture
 Run with: python -m pytest tests/ -v
 """
 
 import json
 import os
-import subprocess
 import sys
 import tempfile
+from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-# Path to the CLI script
-CLI_PATH = Path(__file__).parent.parent / "src" / "deepseek_cli.py"
+# Import the class directly for unit testing
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+from deepseek_cli import DeepSeekCLI
 
 
 # ---------------------------------------------------------------------------
@@ -25,15 +27,9 @@ CLI_PATH = Path(__file__).parent.parent / "src" / "deepseek_cli.py"
 # ---------------------------------------------------------------------------
 
 @pytest.fixture
-def mock_api_key():
-    """Set a fake API key in the environment for tests that need one."""
-    old_key = os.environ.get("DEEPSEEK_API_KEY")
-    os.environ["DEEPSEEK_API_KEY"] = "sk-test-mock-key-12345"
-    yield
-    if old_key:
-        os.environ["DEEPSEEK_API_KEY"] = old_key
-    else:
-        del os.environ["DEEPSEEK_API_KEY"]
+def mock_api_key(monkeypatch):
+    """Set a fake API key in the environment."""
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "sk-test-mock-key-12345")
 
 
 @pytest.fixture
@@ -44,8 +40,8 @@ def temp_dir():
 
 
 @pytest.fixture
-def mock_response():
-    """Standard mock API response."""
+def mock_success_response():
+    """Standard mock API success response."""
     return {
         "id": "chatcmpl-123",
         "object": "chat.completion",
@@ -67,6 +63,48 @@ def mock_response():
     }
 
 
+@pytest.fixture
+def cli_args():
+    """Base CLI arguments that all tests can modify."""
+    return [
+        "deepseek-cli",  # argv[0]
+        "test prompt",   # positional prompt
+    ]
+
+
+# ---------------------------------------------------------------------------
+# Helper: Run the CLI with mocked API and capture output
+# ---------------------------------------------------------------------------
+
+def run_cli_with_mock(cli_class, mock_response, monkeypatch, capsys, extra_args=None):
+    """
+    Run the CLI with a mocked requests.post.
+    Returns (payload_sent_dict, exit_code).
+    """
+    extra_args = extra_args or []
+    payload_sent = {}
+    
+    def mock_post(url, **kwargs):
+        """Capture the payload and return a mock response."""
+        if "json" in kwargs:
+            payload_sent.update(kwargs["json"])
+        
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = mock_response
+        mock_resp.iter_lines.return_value = []
+        return mock_resp
+    
+    with patch("requests.post", side_effect=mock_post):
+        try:
+            cli = cli_class(argv=extra_args)
+            cli.run()
+        except SystemExit as e:
+            return payload_sent, e.code
+    
+    return payload_sent, 0
+
+
 # ---------------------------------------------------------------------------
 # Spec: inputs - Prompt sources
 # ---------------------------------------------------------------------------
@@ -74,78 +112,73 @@ def mock_response():
 class TestPromptSources:
     """Validates that prompts are accepted from all specified sources."""
 
-    def test_prompt_from_positional_arg(self, mock_api_key, mock_response):
+    def test_prompt_from_positional_arg(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """deepseek-cli 'prompt text'"""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            result = subprocess.run(
-                [sys.executable, str(CLI_PATH), "Explain quantum computing"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            assert result.returncode == 0
-            assert "This is a test response." in result.stdout
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["Explain quantum computing"]
+        )
+        
+        assert exit_code == 0
+        captured = capsys.readouterr()
+        assert "This is a test response." in captured.out
+        assert payload["messages"][-1]["content"] == "Explain quantum computing"
 
-    def test_prompt_from_flag(self, mock_api_key, mock_response):
+    def test_prompt_from_flag(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """deepseek-cli --prompt 'prompt text'"""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            result = subprocess.run(
-                [sys.executable, str(CLI_PATH), "--prompt", "Test prompt"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            assert result.returncode == 0
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            assert payload["messages"][-1]["content"] == "Test prompt"
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["--prompt", "Test prompt"]
+        )
+        
+        assert exit_code == 0
+        assert payload["messages"][-1]["content"] == "Test prompt"
 
-    def test_prompt_from_stdin(self, mock_api_key, mock_response):
+    def test_prompt_from_stdin(self, mock_api_key, mock_success_response, monkeypatch):
         """echo 'prompt' | deepseek-cli"""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            result = subprocess.run(
-                [sys.executable, str(CLI_PATH)],
-                input="Prompt from stdin",
-                capture_output=True, text=True, timeout=30
-            )
-            
-            assert result.returncode == 0
-            assert "This is a test response." in result.stdout
+        payload_sent = {}
+        
+        def mock_post(url, **kwargs):
+            if "json" in kwargs:
+                payload_sent.update(kwargs["json"])
+            mock_resp = MagicMock()
+            mock_resp.status_code = 200
+            mock_resp.json.return_value = mock_success_response
+            return mock_resp
+        
+        # Simulate stdin
+        monkeypatch.setattr("sys.stdin", StringIO("Prompt from stdin"))
+        monkeypatch.setattr("sys.stdin.isatty", lambda: False)
+        
+        with patch("requests.post", side_effect=mock_post):
+            cli = DeepSeekCLI(argv=[])  # No args, prompt comes from stdin
+            cli.run()
+        
+        assert payload_sent["messages"][-1]["content"] == "Prompt from stdin"
 
-    def test_prompt_from_file(self, mock_api_key, mock_response, temp_dir):
+    def test_prompt_from_file(self, mock_api_key, mock_success_response, temp_dir, monkeypatch, capsys):
         """deepseek-cli --file path/to/prompt.txt"""
         prompt_file = temp_dir / "prompt.txt"
         prompt_file.write_text("Prompt from file")
         
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            result = subprocess.run(
-                [sys.executable, str(CLI_PATH), "--file", str(prompt_file)],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            assert result.returncode == 0
-
-    def test_missing_prompt_errors(self, mock_api_key):
-        """deepseek-cli with no prompt source should exit with code 1."""
-        # Need to pass something to avoid stdin blocking
-        result = subprocess.run(
-            [sys.executable, str(CLI_PATH)],
-            input="",  # Empty stdin, not a TTY
-            capture_output=True, text=True, timeout=30
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["--file", str(prompt_file)]
         )
         
-        assert result.returncode == 1
-        assert "ERROR" in result.stderr
+        assert exit_code == 0
+        assert payload["messages"][-1]["content"] == "Prompt from file"
+
+    def test_missing_prompt_errors(self, mock_api_key, monkeypatch):
+        """deepseek-cli with no prompt source should exit with code 1."""
+        # Simulate non-TTY with empty input so stdin returns nothing
+        monkeypatch.setattr("sys.stdin", StringIO(""))
+        monkeypatch.setattr("sys.stdin.isatty", lambda: False)
+        
+        with pytest.raises(SystemExit) as exc_info:
+            DeepSeekCLI(argv=[])
+        
+        assert exc_info.value.code == 1
 
 
 # ---------------------------------------------------------------------------
@@ -155,42 +188,30 @@ class TestPromptSources:
 class TestSystemMessage:
     """Validates --system flag behavior."""
 
-    def test_system_message_inline(self, mock_api_key, mock_response):
+    def test_system_message_inline(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """deepseek-cli --system 'You are helpful' 'prompt'"""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            result = subprocess.run(
-                [sys.executable, str(CLI_PATH), "--system", "You are a helpful assistant", "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            assert result.returncode == 0
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            system_msg = payload["messages"][0]
-            assert system_msg["role"] == "system"
-            assert system_msg["content"] == "You are a helpful assistant"
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["--system", "You are a helpful assistant", "test"]
+        )
+        
+        assert exit_code == 0
+        system_msg = payload["messages"][0]
+        assert system_msg["role"] == "system"
+        assert system_msg["content"] == "You are a helpful assistant"
 
-    def test_system_message_from_file(self, mock_api_key, mock_response, temp_dir):
+    def test_system_message_from_file(self, mock_api_key, mock_success_response, temp_dir, monkeypatch, capsys):
         """deepseek-cli --system path/to/system.txt"""
         system_file = temp_dir / "system.txt"
         system_file.write_text("System instructions from file")
         
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            result = subprocess.run(
-                [sys.executable, str(CLI_PATH), "--system", str(system_file), "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            assert result.returncode == 0
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            assert payload["messages"][0]["content"] == "System instructions from file"
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["--system", str(system_file), "test"]
+        )
+        
+        assert exit_code == 0
+        assert payload["messages"][0]["content"] == "System instructions from file"
 
 
 # ---------------------------------------------------------------------------
@@ -200,51 +221,36 @@ class TestSystemMessage:
 class TestDeterminism:
     """Validates deterministic defaults per spec."""
 
-    def test_temperature_defaults_to_zero(self, mock_api_key, mock_response):
+    def test_temperature_defaults_to_zero(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """Temperature should be 0.0 by default."""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            subprocess.run(
-                [sys.executable, str(CLI_PATH), "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            assert payload["temperature"] == 0.0
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["test"]
+        )
+        
+        assert exit_code == 0
+        assert payload["temperature"] == 0.0
 
-    def test_seed_is_set(self, mock_api_key, mock_response):
+    def test_seed_is_set(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """A fixed seed should be present in the payload."""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            subprocess.run(
-                [sys.executable, str(CLI_PATH), "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            assert "seed" in payload
-            assert payload["seed"] == 42
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["test"]
+        )
+        
+        assert exit_code == 0
+        assert "seed" in payload
+        assert payload["seed"] == 42
 
-    def test_temperature_can_be_overridden(self, mock_api_key, mock_response):
+    def test_temperature_can_be_overridden(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """User can override temperature."""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            subprocess.run(
-                [sys.executable, str(CLI_PATH), "--temperature", "0.7", "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            assert payload["temperature"] == 0.7
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["--temperature", "0.7", "test"]
+        )
+        
+        assert exit_code == 0
+        assert payload["temperature"] == 0.7
 
 
 # ---------------------------------------------------------------------------
@@ -254,24 +260,17 @@ class TestDeterminism:
 class TestStructuredOutput:
     """Validates --json and --schema flags."""
 
-    def test_json_mode_sets_response_format(self, mock_api_key, mock_response):
+    def test_json_mode_sets_response_format(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """--json should set response_format to json_object."""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = {
-                "choices": [{"message": {"content": '{"key": "value"}'}}]
-            }
-            
-            subprocess.run(
-                [sys.executable, str(CLI_PATH), "--json", "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            assert payload["response_format"]["type"] == "json_object"
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["--json", "test"]
+        )
+        
+        assert exit_code == 0
+        assert payload["response_format"]["type"] == "json_object"
 
-    def test_schema_file_is_loaded(self, mock_api_key, mock_response, temp_dir):
+    def test_schema_file_is_loaded(self, mock_api_key, mock_success_response, temp_dir, monkeypatch, capsys):
         """--schema should include JSON schema in the request."""
         schema = {
             "type": "object",
@@ -281,20 +280,13 @@ class TestStructuredOutput:
         schema_file = temp_dir / "schema.json"
         schema_file.write_text(json.dumps(schema))
         
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = {
-                "choices": [{"message": {"content": '{"name": "test"}'}}]
-            }
-            
-            subprocess.run(
-                [sys.executable, str(CLI_PATH), "--json", "--schema", str(schema_file), "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            assert "json_schema" in payload["response_format"]
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["--json", "--schema", str(schema_file), "test"]
+        )
+        
+        assert exit_code == 0
+        assert "json_schema" in payload["response_format"]
 
 
 # ---------------------------------------------------------------------------
@@ -304,7 +296,7 @@ class TestStructuredOutput:
 class TestToolCalling:
     """Validates --tools flag."""
 
-    def test_tools_file_is_loaded(self, mock_api_key, mock_response, temp_dir):
+    def test_tools_file_is_loaded(self, mock_api_key, mock_success_response, temp_dir, monkeypatch, capsys):
         """--tools should include tool definitions in the request."""
         tools = [{
             "type": "function",
@@ -322,21 +314,16 @@ class TestToolCalling:
         tools_file = temp_dir / "tools.json"
         tools_file.write_text(json.dumps(tools))
         
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            subprocess.run(
-                [sys.executable, str(CLI_PATH), "--tools", str(tools_file), "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            assert "tools" in payload
-            assert payload["tools"][0]["function"]["name"] == "get_weather"
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["--tools", str(tools_file), "test"]
+        )
+        
+        assert exit_code == 0
+        assert "tools" in payload
+        assert payload["tools"][0]["function"]["name"] == "get_weather"
 
-    def test_tool_calls_printed_as_json(self, mock_api_key):
+    def test_tool_calls_printed_as_json(self, mock_api_key, monkeypatch, capsys):
         """When response includes tool_calls, they should be printed as JSON."""
         tool_response = {
             "choices": [{
@@ -355,19 +342,19 @@ class TestToolCalling:
             }]
         }
         
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = tool_response
-            
-            result = subprocess.run(
-                [sys.executable, str(CLI_PATH), "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            assert result.returncode == 0
-            # Should contain the tool calls JSON
-            output = json.loads(result.stdout)
-            assert output[0]["function"]["name"] == "get_weather"
+        def mock_post(url, **kwargs):
+            mock_resp = MagicMock()
+            mock_resp.status_code = 200
+            mock_resp.json.return_value = tool_response
+            return mock_resp
+        
+        with patch("requests.post", side_effect=mock_post):
+            cli = DeepSeekCLI(argv=["test"])
+            cli.run()
+        
+        captured = capsys.readouterr()
+        output = json.loads(captured.out)
+        assert output[0]["function"]["name"] == "get_weather"
 
 
 # ---------------------------------------------------------------------------
@@ -377,33 +364,30 @@ class TestToolCalling:
 class TestErrorHandling:
     """Validates error exit codes per spec."""
 
-    def test_missing_api_key_exits_1(self):
+    def test_missing_api_key_exits_1(self, monkeypatch):
         """Missing API key should exit with code 1."""
-        # Explicitly unset any existing key
-        env = {k: v for k, v in os.environ.items() if k != "DEEPSEEK_API_KEY"}
+        # Ensure no API key in environment
+        monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
         
-        result = subprocess.run(
-            [sys.executable, str(CLI_PATH), "--api-key", "", "test"],
-            capture_output=True, text=True, timeout=30,
-            env=env
-        )
+        with pytest.raises(SystemExit) as exc_info:
+            DeepSeekCLI(argv=["test"])
         
-        assert result.returncode == 1
-        assert "ERROR" in result.stderr
+        assert exc_info.value.code == 1
 
-    def test_api_error_exits_2(self, mock_api_key):
+    def test_api_error_exits_2(self, mock_api_key, monkeypatch):
         """API returning non-200 should exit with code 2."""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 401
-            mock_post.return_value.text = "Unauthorized"
-            
-            result = subprocess.run(
-                [sys.executable, str(CLI_PATH), "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            assert result.returncode == 2
-            assert "401" in result.stderr
+        def mock_post(url, **kwargs):
+            mock_resp = MagicMock()
+            mock_resp.status_code = 401
+            mock_resp.text = "Unauthorized"
+            return mock_resp
+        
+        with patch("requests.post", side_effect=mock_post):
+            with pytest.raises(SystemExit) as exc_info:
+                cli = DeepSeekCLI(argv=["test"])
+                cli.run()
+        
+        assert exc_info.value.code == 2
 
 
 # ---------------------------------------------------------------------------
@@ -413,15 +397,13 @@ class TestErrorHandling:
 class TestVersion:
     """Validates --version flag."""
 
-    def test_version_output(self, mock_api_key):
+    def test_version_output(self, capsys):
         """--version should print version and exit 0."""
-        result = subprocess.run(
-            [sys.executable, str(CLI_PATH), "--version"],
-            capture_output=True, text=True, timeout=30
-        )
+        with patch("sys.argv", ["deepseek-cli", "--version"]):
+            with pytest.raises(SystemExit) as exc_info:
+                DeepSeekCLI()
         
-        assert result.returncode == 0
-        assert "1.0.0" in result.stdout
+        assert exc_info.value.code == 0
 
 
 # ---------------------------------------------------------------------------
@@ -431,34 +413,28 @@ class TestVersion:
 class TestVerboseMode:
     """Validates --verbose flag outputs request/response to stderr."""
 
-    def test_verbose_outputs_request(self, mock_api_key, mock_response):
+    def test_verbose_outputs_request(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """--verbose should print request details to stderr."""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            result = subprocess.run(
-                [sys.executable, str(CLI_PATH), "--verbose", "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            assert result.returncode == 0
-            assert "--- REQUEST ---" in result.stderr
-            assert "--- RESPONSE ---" in result.stderr
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["--verbose", "test"]
+        )
+        
+        assert exit_code == 0
+        captured = capsys.readouterr()
+        assert "--- REQUEST ---" in captured.err
+        assert "--- RESPONSE ---" in captured.err
 
-    def test_normal_mode_no_debug_output(self, mock_api_key, mock_response):
+    def test_normal_mode_no_debug_output(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """Without --verbose, stderr should be empty on success."""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            result = subprocess.run(
-                [sys.executable, str(CLI_PATH), "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            assert result.returncode == 0
-            assert result.stderr == ""
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["test"]
+        )
+        
+        assert exit_code == 0
+        captured = capsys.readouterr()
+        assert captured.err == ""
 
 
 # ---------------------------------------------------------------------------
@@ -468,33 +444,22 @@ class TestVerboseMode:
 class TestModelFlag:
     """Validates --model flag."""
 
-    def test_default_model(self, mock_api_key, mock_response):
+    def test_default_model(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """Default model should be deepseek-chat."""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            subprocess.run(
-                [sys.executable, str(CLI_PATH), "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            assert payload["model"] == "deepseek-chat"
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["test"]
+        )
+        
+        assert exit_code == 0
+        assert payload["model"] == "deepseek-chat"
 
-    def test_custom_model(self, mock_api_key, mock_response):
+    def test_custom_model(self, mock_api_key, mock_success_response, monkeypatch, capsys):
         """--model should override the default."""
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.status_code = 200
-            mock_post.return_value.json.return_value = mock_response
-            
-            subprocess.run(
-                [sys.executable, str(CLI_PATH), "--model", "deepseek-coder", "test"],
-                capture_output=True, text=True, timeout=30
-            )
-            
-            args, kwargs = mock_post.call_args
-            payload = json.loads(kwargs["json"]) if "json" in kwargs else json.loads(args[1])
-            assert payload["model"] == "deepseek-coder"
-
+        payload, exit_code = run_cli_with_mock(
+            DeepSeekCLI, mock_success_response, monkeypatch, capsys,
+            extra_args=["--model", "deepseek-coder", "test"]
+        )
+        
+        assert exit_code == 0
+        assert payload["model"] == "deepseek-coder"

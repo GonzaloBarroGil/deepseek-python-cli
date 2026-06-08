@@ -20,13 +20,13 @@ class DeepSeekCLI:
     
     BASE_URL = "https://api.deepseek.com/v1/chat/completions"
     
-    def __init__(self):
-        self.args = self._parse_args()
+    def __init__(self, argv=None):
+        self.args = self._parse_args(argv)
         self.api_key = self._get_api_key()
         self.prompt = self._get_prompt()
         self.messages = self._build_messages()
     
-    def _parse_args(self) -> argparse.Namespace:
+    def _parse_args(self, argv=None) -> argparse.Namespace:
         parser = argparse.ArgumentParser(
             description="Deterministic CLI for DeepSeek API"
         )
@@ -34,7 +34,7 @@ class DeepSeekCLI:
             "prompt", nargs="?", default=None,
             help="Prompt text (positional, overridden by --prompt or stdin)"
         )
-        parser.add_argument("--prompt", default=None, help="Prompt as flag")
+        parser.add_argument("--prompt", default=None, dest="prompt_flag", help="Prompt as flag")
         parser.add_argument("--system", default=None, help="System message text or file")
         parser.add_argument("--model", default="deepseek-chat", help="Model name")
         parser.add_argument(
@@ -51,8 +51,8 @@ class DeepSeekCLI:
         parser.add_argument("--verbose", action="store_true")
         parser.add_argument("--version", action="version", version="1.0.0")
         
-        return parser.parse_args()
-    
+        return parser.parse_args(argv)
+        
     def _get_api_key(self) -> str:
         key = self.args.api_key or os.environ.get("DEEPSEEK_API_KEY")
         if not key:
@@ -60,27 +60,46 @@ class DeepSeekCLI:
         return key
     
     def _get_prompt(self) -> str:
-        """Resolve prompt from multiple sources, following spec priority."""
-        # Priority: --prompt flag > positional arg > --file > stdin
+        """Resolve prompt from multiple sources, following spec priority.
+        
+        Priority:
+        1. --prompt flag (stored in args.prompt_flag)
+        2. Positional argument (stored in args.prompt)
+        3. --file flag
+        4. stdin (if not a TTY)
+        """
+        # Check --prompt flag first (highest priority)
+        if self.args.prompt_flag:
+            return self.args.prompt_flag
+        
+        # Check positional argument
         if self.args.prompt:
             return self.args.prompt
-        if self.args.prompt is None and self.args.prompt != "" and self.args.prompt:
-            return self.args.prompt
-        if hasattr(self.args, 'prompt') and self.args.prompt is not None:
-            return self.args.prompt
         
-        # Check positional argument (stored in self.args.prompt by argparse)
-        if self.args.prompt:
-            return self.args.prompt
-        
+        # Check --file flag
         if self.args.file:
             return self.args.file.read_text()
         
-        if not sys.stdin.isatty():
-            return sys.stdin.read().strip()
+        # Check stdin (only if it's being piped, not an interactive terminal)
+        try:
+            is_tty = sys.stdin.isatty()
+        except Exception:
+            is_tty = True
         
-        self._error("No prompt provided. Use --prompt, positional arg, --file, or stdin.", 1)
-    
+        if not is_tty:
+            try:
+                stdin_content = sys.stdin.read().strip()
+                if stdin_content:
+                    return stdin_content
+            except OSError:
+                pass
+        
+        # Nothing found
+        self._error(
+            "No prompt provided. Use --prompt, positional argument, --file, or pipe to stdin.",
+            1
+        )
+
     def _build_messages(self) -> list:
         messages = []
         if self.args.system:
