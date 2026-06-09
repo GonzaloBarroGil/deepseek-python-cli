@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Person's full name"
+    },
+    "age": {
+      "type": "integer",
+      "description": "Age in years",
+      "minimum": 0,
+      "maximum": 150
+    },
+    "city": {
+      "type": "string",
+      "description": "City of residence"
+    },
+    "occupation": {
+      "type": "string",
+      "description": "Job title"
+    }
+  },
+  "required": ["name", "age", "city"]
+}
