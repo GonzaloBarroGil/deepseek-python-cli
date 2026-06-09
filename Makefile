@@ -7,8 +7,7 @@ test:
 	python -m pytest tests/ -v
 
 validate-spec:
-	echo "Validating spec..."
-	# Add JSON Schema validation of the spec file itself
+	python3 scripts/validate_spec.py
 
 freeze:
 	pip freeze > requirements-lock.txt
