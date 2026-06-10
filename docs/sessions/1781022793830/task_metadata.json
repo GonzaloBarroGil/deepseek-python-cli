@@ -1,86 +1,6 @@
 {
   "files_in_context": [
     {
-      "path": "spec/deepseek-cli/v1.0.0.yml",
-      "record_state": "stale",
-      "record_source": "read_tool",
-      "cline_read_date": 1781022799868,
-      "cline_edit_date": null,
-      "user_edit_date": null
-    },
-    {
-      "path": "src/deepseek_cli.py",
-      "record_state": "active",
-      "record_source": "read_tool",
-      "cline_read_date": 1781022803593,
-      "cline_edit_date": null,
-      "user_edit_date": null
-    },
-    {
-      "path": "tests/test_cli.py",
-      "record_state": "active",
-      "record_source": "read_tool",
-      "cline_read_date": 1781022808632,
-      "cline_edit_date": null,
-      "user_edit_date": null
-    },
-    {
-      "path": "tests/test_sanity.py",
-      "record_state": "active",
-      "record_source": "read_tool",
-      "cline_read_date": 1781022808692,
-      "cline_edit_date": null,
-      "user_edit_date": null
-    },
-    {
-      "path": "README.md",
-      "record_state": "active",
-      "record_source": "read_tool",
-      "cline_read_date": 1781022808808,
-      "cline_edit_date": null,
-      "user_edit_date": null
-    },
-    {
-      "path": "Makefile",
-      "record_state": "active",
-      "record_source": "read_tool",
-      "cline_read_date": 1781022809081,
-      "cline_edit_date": null,
-      "user_edit_date": null
-    },
-    {
-      "path": "requirements.txt",
-      "record_state": "active",
-      "record_source": "read_tool",
-      "cline_read_date": 1781022809141,
-      "cline_edit_date": null,
-      "user_edit_date": null
-    },
-    {
-      "path": "requirements-dev.txt",
-      "record_state": "active",
-      "record_source": "read_tool",
-      "cline_read_date": 1781022809234,
-      "cline_edit_date": null,
-      "user_edit_date": null
-    },
-    {
-      "path": "CONSTITUTION.md",
-      "record_state": "stale",
-      "record_source": "cline_edited",
-      "cline_read_date": 1781037233042,
-      "cline_edit_date": 1781037233042,
-      "user_edit_date": null
-    },
-    {
-      "path": "CONSTITUTION.md",
-      "record_state": "stale",
-      "record_source": "cline_edited",
-      "cline_read_date": 1781039638759,
-      "cline_edit_date": 1781039638759,
-      "user_edit_date": null
-    },
-    {
       "path": "CONSTITUTION.md",
       "record_state": "active",
       "record_source": "cline_edited",
@@ -122,42 +42,98 @@
     },
     {
       "path": "spec/deepseek-cli/v1.0.0.yml",
-      "record_state": "stale",
-      "record_source": "read_tool",
-      "cline_read_date": 1781041267287,
-      "cline_edit_date": null,
-      "user_edit_date": null
-    },
-    {
-      "path": "spec/deepseek-cli/v1.0.0.yml",
-      "record_state": "stale",
-      "record_source": "cline_edited",
-      "cline_read_date": 1781041275839,
-      "cline_edit_date": 1781041275839,
-      "user_edit_date": null
-    },
-    {
-      "path": "spec/deepseek-cli/v1.0.0.yml",
-      "record_state": "stale",
-      "record_source": "cline_edited",
-      "cline_read_date": 1781041288837,
-      "cline_edit_date": 1781041288837,
-      "user_edit_date": null
-    },
-    {
-      "path": "spec/deepseek-cli/v1.0.0.yml",
-      "record_state": "stale",
+      "record_state": "active",
       "record_source": "cline_edited",
       "cline_read_date": 1781041307937,
       "cline_edit_date": 1781041307937,
       "user_edit_date": null
     },
     {
-      "path": "spec/deepseek-cli/v1.0.0.yml",
+      "path": "Makefile",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781042000000,
+      "cline_edit_date": 1781042000000,
+      "user_edit_date": null
+    },
+    {
+      "path": "scripts/validate_spec.py",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781042000000,
+      "cline_edit_date": 1781042000000,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sessions/README.md",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781042000000,
+      "cline_edit_date": 1781042000000,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sessions/1781022793830/focus_chain_taskid_1781022793830.md",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781042050000,
+      "cline_edit_date": 1781042050000,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sessions/1781022793830/task_metadata.json",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781042050000,
+      "cline_edit_date": 1781042050000,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/deepseek_cli.py",
       "record_state": "active",
       "record_source": "read_tool",
-      "cline_read_date": 1781041312691,
-      "cline_edit_date": 1781041307937,
+      "cline_read_date": 1781022803593,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "tests/test_cli.py",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781022808632,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "tests/test_sanity.py",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781022808692,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "requirements.txt",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781022809141,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "requirements-dev.txt",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781022809234,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "README.md",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781022808808,
+      "cline_edit_date": 1781071480000,
       "user_edit_date": null
     }
   ],

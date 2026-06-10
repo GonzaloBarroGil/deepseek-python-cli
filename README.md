@@ -4,7 +4,7 @@
 >
 > **Version:** 1.0.0  
 > **Spec:** `spec/deepseek-cli/v1.0.0.yml`  
-> **License:** MIT
+> **License:** Apache-2.0
 
 ---
 
@@ -60,7 +60,7 @@ It is the first building block of a broader **Spec-Driven Development (SDD)** en
 
 | Property | Value |
 |---|---|
-| **Language** | Python 3.9+ |
+| **Language** | Python 3.9+ (tested on 3.14.5) |
 | **API Endpoint** | `https://api.deepseek.com/v1/chat/completions` |
 | **Default Model** | `deepseek-chat` |
 | **Default Temperature** | `0.0` |
@@ -110,8 +110,8 @@ It is the first building block of a broader **Spec-Driven Development (SDD)** en
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/deepseek-sdd-project.git
-cd deepseek-sdd-project
+git clone git@github.com:GonzaloBarroGil/deepseek-python-cli.git
+cd deepseek-python-cli
 
 # Install runtime dependency
 pip install -r requirements.txt
@@ -168,7 +168,7 @@ The CLI accepts prompts from four sources, in this priority order:
 
 | Priority | Source | Example
 |---|---|---|
-| 1 (highest) | `--prompt flag` | `deepseek-cli` --prompt "text"` |
+| 1 (highest) | `--prompt flag` | `deepseek-cli --prompt "text"` |
 | 2 | Positional argument | `deepseek-cli "text"` |
 | 3 | `--file flag` | `deepseek-cli --file prompt.txt` |
 | 4 (lowest) | stdin pipe | `echo "text" | deepseek-cli` |
@@ -323,12 +323,11 @@ fi
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `DEEPSEEK_API_KEY` | Yes* | — | Your DeepSeek API key |
-| `DEEPSEEK_BASE_URL` | No | `https://api.deepseek.com/v1` | Custom endpoint (proxies, etc.) |
 
 ## Project Structure
 
 ```text
-deepseek-sdd-project/
+deepseek-python-cli/
 │
 ├── spec/                          # Specification files (the source of truth)
 │   └── deepseek-cli/
@@ -347,9 +346,9 @@ deepseek-sdd-project/
 │
 ├── requirements.txt               # Runtime dependencies
 ├── requirements-dev.txt           # Development dependencies
-├── Makefile                       # Automation (install, test, freeze)
+├── Makefile                       # Automation (install, test, validate-spec, freeze)
 ├── README.md                      # This file
-└── LICENSE                        # MIT
+└── LICENSE                        # Apache-2.0
 ```
 
 ## Development
@@ -449,7 +448,7 @@ For bugs that don't change the spec, a test reproducing the bug is still require
 
 ## License
 
-MIT License — see LICENSE for details.
+Apache-2.0 License — see LICENSE for details.
 
 ## Related Projects
 
@@ -458,17 +457,3 @@ MIT License — see LICENSE for details.
 
 *Built with determinism in mind. Spec version: v1.0.0.*
 
-```text
-
----
-
-This README serves as:
-
-1. **Onboarding documentation** — Anyone can install and use the tool in under 2 minutes
-2. **Technical specification** — All defaults, exit codes, and behaviors are documented
-3. **Development guide** — The SDD workflow is explained for contributors
-4. **Test documentation** — The test-to-spec mapping is visible
-5. **Project roadmap** — Future versions are planned and transparent
-
-The key SDD touchpoints are the spec version references, the explicit workflow for making changes, and the test coverage table that directly links tests to specification sections.
-```
