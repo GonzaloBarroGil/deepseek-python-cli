@@ -2,8 +2,8 @@
 
 > Deterministic CLI wrapper for the DeepSeek API
 >
-> **Version:** 1.0.0  
-> **Spec:** `spec/deepseek-cli/v1.0.0.yml`  
+> **Version:** 1.1.0  
+> **Spec:** `spec/deepseek-cli/v1.1.0.yml`  
 > **License:** Apache-2.0
 
 ---
@@ -106,27 +106,24 @@ It is the first building block of a broader **Spec-Driven Development (SDD)** en
 
 ## Installation
 
-### Option 1: Direct Script (Recommended for Development)
+### Option 1: pip Install (Recommended)
 
 ```bash
 # Clone the repository
 git clone git@github.com:GonzaloBarroGil/deepseek-python-cli.git
 cd deepseek-python-cli
 
-# Install runtime dependency
-pip install -r requirements.txt
+# Install in editable mode (development)
+pip install -e .
 
-# Make executable
-chmod +x src/deepseek_cli.py
-
-# Optional: symlink to PATH
-sudo ln -s $(pwd)/src/deepseek_cli.py /usr/local/bin/deepseek-cli
+# Or install directly
+pip install .
 ```
 
-### Option 2: pip Install (Coming Soon)
+### Option 2: PyPI (Coming Soon)
 
 ```bash
-pip install deepseek-cli  # Not yet published — see Roadmap
+pip install deepseek-cli  # Not yet published on PyPI — see Roadmap
 ```
 
 ### Set Your API Key
@@ -331,19 +328,26 @@ deepseek-python-cli/
 │
 ├── spec/                          # Specification files (the source of truth)
 │   └── deepseek-cli/
-│       └── v1.0.0.yml             # Current version spec
+│       ├── v1.0.0.yml             # Previous version spec
+│       └── v1.1.0.yml             # Current version spec
 │
 ├── src/                           # Implementation
-│   └── deepseek_cli.py            # The CLI script
+│   └── deepseek_cli/              # Python package
+│       ├── __init__.py             # Package exports
+│       ├── main.py                 # CLI logic
+│       └── py.typed                # PEP 561 marker
 │
 ├── tests/                         # Test suite
-│   └── test_cli.py                # Validates against spec
+│   ├── test_cli.py                # Validates CLI against spec
+│   ├── test_packaging.py          # Validates packaging structure
+│   └── test_sanity.py             # Minimal integration test
 │
 ├── examples/                      # Example scripts and configs
 │   ├── tools.json                 # Sample tool definitions
 │   ├── schema.json                # Sample JSON schema
 │   └── pipeline.sh                # Example shell pipeline
 │
+├── pyproject.toml                 # Package build configuration
 ├── requirements.txt               # Runtime dependencies
 ├── requirements-dev.txt           # Development dependencies
 ├── Makefile                       # Automation (install, test, validate-spec, freeze)
@@ -389,7 +393,11 @@ Every test class maps to a section of the specification:
 | `TestVersion` | Version flag | 1 |
 | `TestVerboseMode` | Verbose debugging | 2 |
 | `TestModelFlag` | Model selection | 2 |
-| **Total** |  | **21 tests** |
+| `TestPackageStructure` | Packaging - structure | 4 |
+| `TestEntryPointExports` | Packaging - exports | 2 |
+| `TestPyprojectToml` | Packaging - pyproject.toml | 5 |
+| `TestOldFileRemoved` | Packaging - migration | 1 |
+| **Total** |  | **34 tests** |
 
 ## Making Changes (SDD Workflow)
 
@@ -418,7 +426,7 @@ python -m pytest tests/ -v
 
 5. Commit atomically
 ```bash
-git add spec/deepseek-cli/v1.1.0.yml tests/test_cli.py src/deepseek_cli.py README.md
+git add spec/deepseek-cli/v1.1.0.yml tests/test_cli.py src/deepseek_cli/ README.md
 git commit -m "feat: add streaming support (v1.1.0)"
 git tag v1.1.0
 ```
@@ -427,12 +435,12 @@ git tag v1.1.0
 
 | Version | Feature | Status |
 |---|---|---|
-| `1.0.0` | Basic CLI, prompt sources, system messages, JSON mode, tools | ✅ Current |
-| `1.1.0` | Streaming output (`--stream`) | 🔄 Planned |
-| `1.2.0` | Conversation history (`--continue`, `--history-file`) | 📋 Planned |
-| `1.3.0` | Multi-turn chat mode (`--interactive`) | 📋 Planned |
+| `1.0.0` | Basic CLI, prompt sources, system messages, JSON mode, tools | ✅ Released |
+| `1.1.0` | Pip packaging (`pip install .`), streaming (`--stream`) | ✅ Current |
+| `1.2.0` | PyPI publication (`pip install deepseek-cli`) | 📋 Planned |
+| `1.3.0` | Conversation history (`--continue`, `--history-file`) | 📋 Planned |
+| `1.4.0` | Multi-turn chat mode (`--interactive`) | 📋 Planned |
 | `2.0.0` | Orchestrator integration (agent/sub-agent support) | 📋 Planned |
-| `2.1.0` | pip package (`pip install deepseek-cli`) | 📋 Planned |
 
 ## Contributing
 
@@ -455,5 +463,5 @@ Apache-2.0 License — see LICENSE for details.
 - DeepSeek API Documentation
 - OpenAI Function Calling Guide (compatible format)
 
-*Built with determinism in mind. Spec version: v1.0.0.*
+*Built with determinism in mind. Spec version: v1.1.0.*
 
