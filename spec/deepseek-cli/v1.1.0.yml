@@ -1,0 +1,88 @@
+# spec/deepseek-cli/v1.1.0.yml
+name: deepseek-cli
+version: 1.1.0
+description: Deterministic CLI wrapper for DeepSeek API — pip-installable package
+
+inputs:
+  REQUIRED:
+    - flag: prompt
+      type: string
+      note: from stdin, positional arg, or --prompt flag
+  OPTIONAL:
+    - flag: --system
+      type: string
+      note: system message file or inline
+    - flag: --model
+      type: string
+      default: deepseek-chat
+    - flag: --temperature
+      type: float
+      default: 0.0
+      note: for determinism
+    - flag: --max-tokens
+      type: int
+      default: 4096
+    - flag: --json
+      type: flag
+      note: request structured output
+    - flag: --schema
+      type: path
+      note: JSON Schema file for structured output
+    - flag: --tools
+      type: path
+      note: tool definitions file
+    - flag: --api-key
+      type: string
+      note: falls back to DEEPSEEK_API_KEY env var
+    - flag: --stream
+      type: flag
+      note: stream output
+    - flag: --verbose
+      type: flag
+      note: log full request/response to stderr
+    - flag: --file
+      type: path
+      note: read prompt from file
+    - flag: --version
+      type: flag
+
+outputs:
+  SUCCESS:
+    - stdout: model response text
+    - exit code: 0
+  ERRORS:
+    - Missing API key: exit code 1, stderr message
+    - API error: exit code 2, stderr with status code
+    - Schema validation failure: exit code 3, stderr details
+
+behavior:
+  determinism:
+    - temperature defaults to 0.0
+    - seed parameter sent when available
+    - structured output uses strict JSON mode when --json is set
+  piping:
+    - "Accepts stdin: echo \"prompt\" | deepseek-cli"
+    - "Positional: deepseek-cli \"prompt\""
+    - "Flag: deepseek-cli --prompt \"prompt\""
+  logging:
+    - --verbose flag outputs full request/response to stderr
+
+packaging:
+  package_name: deepseek-cli
+  build_system: setuptools
+  python_minimum: "3.9"
+  runtime_dependencies:
+    - requests>=2.31.0
+  entry_point:
+    console_script: deepseek-cli
+    module: deepseek_cli.main:main
+  install_methods:
+    - "pip install deepseek-cli"
+    - "pip install git+https://github.com/GonzaloBarroGil/deepseek-python-cli.git"
+    - "git clone + pip install -e ."
+
+examples:
+  - "pip install deepseek-cli"
+  - "deepseek-cli \"Explain quantum computing\""
+  - "cat question.txt | deepseek-cli --system system.txt"
+  - "deepseek-cli --prompt \"...\" --json --schema response.schema.json"
