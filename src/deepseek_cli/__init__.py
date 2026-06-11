@@ -4,7 +4,7 @@ Version: 1.1.0
 Spec: spec/deepseek-cli/v1.1.0.yml
 """
 
-from deepseek_cli.main import main
+from deepseek_cli.main import DeepSeekCLI, main as entry_point
 
 __version__ = "1.1.0"
-__all__ = ["main"]
+__all__ = ["DeepSeekCLI", "entry_point"]

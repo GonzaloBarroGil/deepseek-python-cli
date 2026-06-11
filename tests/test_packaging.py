@@ -42,12 +42,15 @@ class TestEntryPointExports:
     """Validate that the package exports the expected symbols."""
 
     def test_init_exports_main_function(self):
-        """__init__.py must export a main function."""
+        """__init__.py must export DeepSeekCLI and the entry_point alias."""
         import deepseek_cli
-        assert hasattr(deepseek_cli, "main"), (
-            "deepseek_cli must export 'main' function"
+        assert hasattr(deepseek_cli, "DeepSeekCLI"), (
+            "deepseek_cli must export 'DeepSeekCLI' class"
         )
-        assert callable(deepseek_cli.main)
+        assert hasattr(deepseek_cli, "entry_point"), (
+            "deepseek_cli must export 'entry_point' function"
+        )
+        assert callable(deepseek_cli.entry_point)
 
     def test_main_module_has_main_function(self):
         """deepseek_cli.main must define a callable main()."""
