@@ -100,10 +100,10 @@ class TestPyprojectToml:
         )
 
     def test_version_matches_spec(self):
-        """Package version must match the spec version (1.1.0)."""
+        """Package version must match the spec version (1.2.0)."""
         version = self.data["project"]["version"]
-        assert version == "1.1.0", (
-            f"pyproject.toml version {version} != spec version 1.1.0"
+        assert version == "1.2.0", (
+            f"pyproject.toml version {version} != spec version 1.2.0"
         )
 
     def test_python_minimum_3_9(self):
