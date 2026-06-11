@@ -126,3 +126,119 @@ class TestOldFileRemoved:
         assert not old_file.exists(), (
             "src/deepseek_cli.py must be removed after packaging migration"
         )
+
+
+# ---------------------------------------------------------------------------
+# TestPyPIReadiness — validates PyPI publication metadata per v1.2.0 spec
+# ---------------------------------------------------------------------------
+class TestPyPIReadiness:
+    """Validate pyproject.toml and Makefile are ready for PyPI publication."""
+
+    @pytest.fixture(autouse=True)
+    def load_pyproject(self):
+        """Load and parse pyproject.toml once per test."""
+        pyproject_path = Path("pyproject.toml")
+        if not pyproject_path.is_file():
+            pytest.skip("pyproject.toml does not exist yet")
+        with open(pyproject_path, "rb") as f:
+            self.data = tomllib.load(f)
+
+    def test_pyproject_has_urls(self):
+        """Spec v1.2.0 pypi: project.urls must have Homepage, Repository, Bug Tracker."""
+        urls = self.data["project"].get("urls", {})
+        assert "Homepage" in urls, "project.urls must contain 'Homepage'"
+        assert "Repository" in urls, "project.urls must contain 'Repository'"
+        assert "Bug Tracker" in urls, "project.urls must contain 'Bug Tracker'"
+        assert urls["Homepage"].startswith("https://"), (
+            "Homepage must be a valid URL"
+        )
+        assert urls["Repository"].startswith("https://"), (
+            "Repository must be a valid URL"
+        )
+
+    def test_pyproject_has_classifiers(self):
+        """Spec v1.2.0 pypi: at least 3 Trove classifiers required."""
+        classifiers = self.data["project"].get("classifiers", [])
+        assert len(classifiers) >= 3, (
+            f"Expected >= 3 classifiers, got {len(classifiers)}"
+        )
+        # Must include license classifier
+        license_classifiers = [c for c in classifiers if c.startswith("License ::")]
+        assert len(license_classifiers) >= 1, (
+            "At least one License classifier is required"
+        )
+        # Must include Python version classifiers
+        python_classifiers = [c for c in classifiers if "Python :: 3" in c]
+        assert len(python_classifiers) >= 1, (
+            "At least one Programming Language :: Python :: 3 classifier is required"
+        )
+
+    def test_pyproject_has_keywords(self):
+        """Spec v1.2.0 pypi: keywords field must be non-empty."""
+        keywords = self.data["project"].get("keywords", [])
+        assert len(keywords) >= 3, (
+            f"Expected >= 3 keywords, got {len(keywords)}: {keywords}"
+        )
+
+    def test_pyproject_has_readme(self):
+        """Spec v1.2.0 pypi: readme field must point to README.md."""
+        readme = self.data["project"].get("readme", "")
+        assert readme == "README.md", (
+            f"readme must be 'README.md', got '{readme}'"
+        )
+        assert Path("README.md").is_file(), (
+            "README.md must exist at project root"
+        )
+
+    def test_description_content_type(self):
+        """Spec v1.2.0 pypi: description-content-type should be text/markdown."""
+        content_type = self.data["project"].get("description-content-type", "")
+        assert content_type == "text/markdown", (
+            f"description-content-type must be 'text/markdown', got '{content_type}'"
+        )
+
+    def test_makefile_has_build_target(self):
+        """Spec v1.2.0 pypi: Makefile must have a build target."""
+        makefile = Path("Makefile")
+        assert makefile.is_file(), "Makefile must exist"
+        content = makefile.read_text()
+        assert "build:" in content, (
+            "Makefile must contain a 'build:' target"
+        )
+        assert "python -m build" in content or "pyproject-build" in content, (
+            "Makefile build target must invoke 'python -m build'"
+        )
+
+    def test_makefile_has_publish_target(self):
+        """Spec v1.2.0 pypi: Makefile must have a publish target."""
+        makefile = Path("Makefile")
+        assert makefile.is_file(), "Makefile must exist"
+        content = makefile.read_text()
+        assert "publish:" in content, (
+            "Makefile must contain a 'publish:' target"
+        )
+        assert "twine" in content, (
+            "Makefile publish target must reference twine"
+        )
+
+    def test_version_consistency(self):
+        """Spec v1.2.0: pyproject.toml, __init__.py, and spec must agree on version."""
+        # pyproject.toml version
+        pyproject_version = self.data["project"]["version"]
+
+        # __init__.py version
+        init_path = Path("src/deepseek_cli/__init__.py")
+        assert init_path.is_file(), "__init__.py must exist"
+        init_content = init_path.read_text()
+        import re
+        version_match = re.search(r'__version__\s*=\s*["\']([^"\']+)["\']', init_content)
+        assert version_match, "__init__.py must define __version__"
+        init_version = version_match.group(1)
+
+        assert pyproject_version == init_version, (
+            f"Version mismatch: pyproject.toml={pyproject_version}, "
+            f"__init__.py={init_version}"
+        )
+        assert pyproject_version == "1.2.0", (
+            f"Both must be 1.2.0, got {pyproject_version}"
+        )
