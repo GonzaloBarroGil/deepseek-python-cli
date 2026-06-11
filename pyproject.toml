@@ -4,14 +4,45 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "deepseek-cli"
-version = "1.1.0"
+version = "1.2.0"
 description = "Deterministic CLI wrapper for the DeepSeek API"
 readme = "README.md"
+description-content-type = "text/markdown"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.9"
 dependencies = [
     "requests>=2.31.0",
 ]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+]
+keywords = [
+    "deepseek",
+    "cli",
+    "ai",
+    "llm",
+    "api",
+    "chat",
+    "deterministic",
+]
+
+[project.urls]
+Homepage = "https://github.com/GonzaloBarroGil/deepseek-python-cli"
+Repository = "https://github.com/GonzaloBarroGil/deepseek-python-cli"
+"Bug Tracker" = "https://github.com/GonzaloBarroGil/deepseek-python-cli/issues"
 
 [project.scripts]
 deepseek-cli = "deepseek_cli.main:main"

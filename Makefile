@@ -10,3 +10,9 @@ validate-spec:
 freeze:
 	pip freeze > requirements-lock.txt
 
+build:
+	python -m build
+
+publish:
+	twine upload dist/*
+
