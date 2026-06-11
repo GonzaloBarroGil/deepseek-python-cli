@@ -2,8 +2,8 @@
 
 > Deterministic CLI wrapper for the DeepSeek API
 >
-> **Version:** 1.1.0  
-> **Spec:** `spec/deepseek-cli/v1.1.0.yml`  
+> **Version:** 1.2.0  
+> **Spec:** `spec/deepseek-cli/v1.2.0.yml`  
 > **License:** Apache-2.0
 
 ---
@@ -120,11 +120,13 @@ pip install -e .
 pip install .
 ```
 
-### Option 2: PyPI (Coming Soon)
+### Option 2: PyPI
 
 ```bash
-pip install deepseek-cli  # Not yet published on PyPI — see Roadmap
+pip install deepseek-cli
 ```
+
+The package is published on PyPI at [https://pypi.org/project/deepseek-cli/](https://pypi.org/project/deepseek-cli/).
 
 ### Set Your API Key
 
@@ -329,7 +331,8 @@ deepseek-python-cli/
 ├── spec/                          # Specification files (the source of truth)
 │   └── deepseek-cli/
 │       ├── v1.0.0.yml             # Previous version spec
-│       └── v1.1.0.yml             # Current version spec
+│       ├── v1.1.0.yml             # Previous version spec
+│       └── v1.2.0.yml             # Current version spec
 │
 ├── src/                           # Implementation
 │   └── deepseek_cli/              # Python package
@@ -350,7 +353,7 @@ deepseek-python-cli/
 ├── pyproject.toml                 # Package build configuration
 ├── requirements.txt               # Runtime dependencies
 ├── requirements-dev.txt           # Development dependencies
-├── Makefile                       # Automation (install, test, validate-spec, freeze)
+├── Makefile                       # Automation (install, test, validate-spec, freeze, build, publish)
 ├── README.md                      # This file
 └── LICENSE                        # Apache-2.0
 ```
@@ -397,7 +400,8 @@ Every test class maps to a section of the specification:
 | `TestEntryPointExports` | Packaging - exports | 2 |
 | `TestPyprojectToml` | Packaging - pyproject.toml | 5 |
 | `TestOldFileRemoved` | Packaging - migration | 1 |
-| **Total** |  | **34 tests** |
+| `TestPyPIReadiness` | PyPI publication metadata | 8 |
+| **Total** |  | **42 tests** |
 
 ## Making Changes (SDD Workflow)
 
@@ -436,8 +440,8 @@ git tag v1.1.0
 | Version | Feature | Status |
 |---|---|---|
 | `1.0.0` | Basic CLI, prompt sources, system messages, JSON mode, tools | ✅ Released |
-| `1.1.0` | Pip packaging (`pip install .`), streaming (`--stream`) | ✅ Current |
-| `1.2.0` | PyPI publication (`pip install deepseek-cli`) | 📋 Planned |
+| `1.1.0` | Pip packaging (`pip install .`), streaming (`--stream`) | ✅ Released |
+| `1.2.0` | PyPI publication (`pip install deepseek-cli`) | ✅ Current |
 | `1.3.0` | Conversation history (`--continue`, `--history-file`) | 📋 Planned |
 | `1.4.0` | Multi-turn chat mode (`--interactive`) | 📋 Planned |
 | `2.0.0` | Orchestrator integration (agent/sub-agent support) | 📋 Planned |
@@ -463,5 +467,5 @@ Apache-2.0 License — see LICENSE for details.
 - DeepSeek API Documentation
 - OpenAI Function Calling Guide (compatible format)
 
-*Built with determinism in mind. Spec version: v1.1.0.*
+*Built with determinism in mind. Spec version: v1.2.0.*
 
