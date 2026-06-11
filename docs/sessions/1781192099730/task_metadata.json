@@ -1,0 +1,421 @@
+{
+  "files_in_context": [
+    {
+      "path": "CONSTITUTION.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781192103401,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "spec/deepseek-cli/v1.1.0.yml",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781192106606,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sessions/1781126274522/focus_chain_taskid_1781126274522.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781192109992,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sessions/1781126274522/context_history.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781192115946,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "pyproject.toml",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781192128499,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781192138504,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "tests/test_packaging.py",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781192154879,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "Makefile",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781192162179,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": ".gitignore",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781192183721,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "spec/deepseek-cli/v1.2.0.yml",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781195069246,
+      "cline_edit_date": 1781195069246,
+      "user_edit_date": null
+    },
+    {
+      "path": "tests/test_packaging.py",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781195381844,
+      "cline_edit_date": 1781195381844,
+      "user_edit_date": null
+    },
+    {
+      "path": "pyproject.toml",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781195402155,
+      "cline_edit_date": 1781195402155,
+      "user_edit_date": null
+    },
+    {
+      "path": "pyproject.toml",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781195421452,
+      "cline_edit_date": 1781195421452,
+      "user_edit_date": null
+    },
+    {
+      "path": "pyproject.toml",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781195433613,
+      "cline_edit_date": 1781195433613,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/deepseek_cli/__init__.py",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781195440968,
+      "cline_edit_date": 1781195440968,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/deepseek_cli/__init__.py",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781195449261,
+      "cline_edit_date": 1781195449261,
+      "user_edit_date": null
+    },
+    {
+      "path": "Makefile",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195452517,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "Makefile",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781195460164,
+      "cline_edit_date": 1781195460164,
+      "user_edit_date": null
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195470698,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "user_edited",
+      "cline_read_date": 1781195470698,
+      "cline_edit_date": null,
+      "user_edit_date": 1781195480953
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195485014,
+      "cline_edit_date": null,
+      "user_edit_date": 1781195480953
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781195496090,
+      "cline_edit_date": 1781195496090,
+      "user_edit_date": 1781195480953
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781195506747,
+      "cline_edit_date": 1781195506747,
+      "user_edit_date": 1781195480953
+    },
+    {
+      "path": "CONSTITUTION.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195535518,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sessions/1781126274522/focus_chain_taskid_1781126274522.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195535808,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "spec/deepseek-cli/v1.2.0.yml",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195545847,
+      "cline_edit_date": 1781195069246,
+      "user_edit_date": null
+    },
+    {
+      "path": "docs/sessions/1781126274522/api_conversation_history.json",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195546641,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "pyproject.toml",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195612397,
+      "cline_edit_date": 1781195433613,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/deepseek_cli/__init__.py",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195612579,
+      "cline_edit_date": 1781195449261,
+      "user_edit_date": null
+    },
+    {
+      "path": "Makefile",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195612758,
+      "cline_edit_date": 1781195460164,
+      "user_edit_date": null
+    },
+    {
+      "path": "tests/test_packaging.py",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195632613,
+      "cline_edit_date": 1781195381844,
+      "user_edit_date": null
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195671741,
+      "cline_edit_date": 1781195506747,
+      "user_edit_date": 1781195480953
+    },
+    {
+      "path": "CONSTITUTION.md",
+      "record_state": "active",
+      "record_source": "read_tool",
+      "cline_read_date": 1781195921015,
+      "cline_edit_date": null,
+      "user_edit_date": null
+    },
+    {
+      "path": "tests/test_packaging.py",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781196858267,
+      "cline_edit_date": 1781195381844,
+      "user_edit_date": null
+    },
+    {
+      "path": "pyproject.toml",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781196858480,
+      "cline_edit_date": 1781195433613,
+      "user_edit_date": null
+    },
+    {
+      "path": "Makefile",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781196858689,
+      "cline_edit_date": 1781195460164,
+      "user_edit_date": null
+    },
+    {
+      "path": "tests/test_packaging.py",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781196880710,
+      "cline_edit_date": 1781196880710,
+      "user_edit_date": null
+    },
+    {
+      "path": "pyproject.toml",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781197859511,
+      "cline_edit_date": 1781197859511,
+      "user_edit_date": null
+    },
+    {
+      "path": "Makefile",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781197868023,
+      "cline_edit_date": 1781195460164,
+      "user_edit_date": null
+    },
+    {
+      "path": "Makefile",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781197877409,
+      "cline_edit_date": 1781197877409,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/deepseek_cli/__init__.py",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781197881268,
+      "cline_edit_date": 1781195449261,
+      "user_edit_date": null
+    },
+    {
+      "path": "src/deepseek_cli/__init__.py",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781197891406,
+      "cline_edit_date": 1781197891406,
+      "user_edit_date": null
+    },
+    {
+      "path": "tests/test_packaging.py",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781198597336,
+      "cline_edit_date": 1781198597336,
+      "user_edit_date": null
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "read_tool",
+      "cline_read_date": 1781199329915,
+      "cline_edit_date": 1781195506747,
+      "user_edit_date": 1781195480953
+    },
+    {
+      "path": "README.md",
+      "record_state": "stale",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781199368793,
+      "cline_edit_date": 1781199368793,
+      "user_edit_date": 1781195480953
+    },
+    {
+      "path": "README.md",
+      "record_state": "active",
+      "record_source": "cline_edited",
+      "cline_read_date": 1781199382189,
+      "cline_edit_date": 1781199382189,
+      "user_edit_date": 1781195480953
+    }
+  ],
+  "model_usage": [
+    {
+      "ts": 1781192099785,
+      "model_id": "deepseek-v4-pro",
+      "model_provider_id": "openai",
+      "mode": "plan"
+    },
+    {
+      "ts": 1781195051476,
+      "model_id": "deepseek-v4-pro",
+      "model_provider_id": "openai",
+      "mode": "act"
+    },
+    {
+      "ts": 1781195914762,
+      "model_id": "deepseek-v4-pro",
+      "model_provider_id": "openai",
+      "mode": "plan"
+    },
+    {
+      "ts": 1781196853283,
+      "model_id": "deepseek-v4-pro",
+      "model_provider_id": "openai",
+      "mode": "act"
+    },
+    {
+      "ts": 1781197448006,
+      "model_id": "deepseek-v4-pro",
+      "model_provider_id": "openai",
+      "mode": "plan"
+    },
+    {
+      "ts": 1781197684342,
+      "model_id": "deepseek-v4-pro",
+      "model_provider_id": "openai",
+      "mode": "act"
+    }
+  ],
+  "environment_history": [
+    {
+      "ts": 1781192099784,
+      "os_name": "linux",
+      "os_version": "7.0.11-200.fc44.x86_64",
+      "os_arch": "x64",
+      "host_name": "VSCodium",
+      "host_version": "1.121.0",
+      "cline_version": "3.89.0"
+    }
+  ]
+}
