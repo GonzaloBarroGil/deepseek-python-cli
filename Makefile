@@ -11,6 +11,7 @@ freeze:
 	pip freeze > requirements-lock.txt
 
 build:
+	rm -rf dist/
 	python -m build
 
 publish:
