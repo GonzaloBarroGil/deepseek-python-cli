@@ -2,8 +2,8 @@
 
 > Deterministic CLI wrapper for the DeepSeek API
 >
-> **Version:** 1.2.0  
-> **Spec:** `spec/deepseek-cli/v1.2.0.yml`  
+> **Version:** 1.3.0  
+> **Spec:** `spec/deepseek-cli/v1.3.0.yml`  
 > **License:** Apache-2.0
 
 ---
@@ -123,10 +123,10 @@ pip install .
 ### Option 2: PyPI
 
 ```bash
-pip install deepseek-cli
+pip install deterministic-deepseek-cli
 ```
 
-The package is published on PyPI at [https://pypi.org/project/deepseek-cli/](https://pypi.org/project/deepseek-cli/).
+The package is published on PyPI at [https://pypi.org/project/deterministic-deepseek-cli/](https://pypi.org/project/deterministic-deepseek-cli/).
 
 ### Set Your API Key
 
@@ -441,9 +441,10 @@ git tag v1.1.0
 |---|---|---|
 | `1.0.0` | Basic CLI, prompt sources, system messages, JSON mode, tools | ✅ Released |
 | `1.1.0` | Pip packaging (`pip install .`), streaming (`--stream`) | ✅ Released |
-| `1.2.0` | PyPI publication (`pip install deepseek-cli`) | ✅ Current |
-| `1.3.0` | Conversation history (`--continue`, `--history-file`) | 📋 Planned |
-| `1.4.0` | Multi-turn chat mode (`--interactive`) | 📋 Planned |
+| `1.2.0` | PyPI publication (`pip install deepseek-cli`) | ✅ Released |
+| `1.3.0` | PyPI rename to `deterministic-deepseek-cli`, Makefile fix | ✅ Current |
+| `1.4.0` | Conversation history (`--continue`, `--history-file`) | 📋 Planned |
+| `1.5.0` | Multi-turn chat mode (`--interactive`) | 📋 Planned |
 | `2.0.0` | Orchestrator integration (agent/sub-agent support) | 📋 Planned |
 
 ## Contributing
@@ -467,5 +468,5 @@ Apache-2.0 License — see LICENSE for details.
 - DeepSeek API Documentation
 - OpenAI Function Calling Guide (compatible format)
 
-*Built with determinism in mind. Spec version: v1.2.0.*
+*Built with determinism in mind. Spec version: v1.3.0.*
 

@@ -16,3 +16,5 @@ build:
 publish:
 	twine upload dist/*
 
+.PHONY: install test validate-spec freeze build publish
+
