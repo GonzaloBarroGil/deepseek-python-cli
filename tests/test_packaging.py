@@ -205,6 +205,9 @@ class TestPyPIReadiness:
         assert "python -m build" in content or "pyproject-build" in content, (
             "Makefile build target must invoke 'python -m build'"
         )
+        assert "rm -rf dist/" in content, (
+            "Makefile build target must clean dist/ before building"
+        )
 
     def test_makefile_has_publish_target(self):
         """Spec v1.2.0 pypi: Makefile must have a publish target."""
